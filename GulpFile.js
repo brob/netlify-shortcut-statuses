@@ -76,7 +76,7 @@ gulp.task('image:get', function() {
 });
 
 gulp.task('status:get', function () {
-    var url = `https://api.netlify.com/api/v1/forms/${process.env.APPROVED_COMMENTS_FORM_ID}/submissions/?access_token=${process.env.API_AUTH}`;
+    var url = `https://api.netlify.com/api/v1/forms/${process.env.STATUS_FORM_ID}/submissions/?access_token=${process.env.API_AUTH}`;
     console.log(url);
     request(url, function (err, response, body) {
         if (!err && response.statusCode === 200) {
