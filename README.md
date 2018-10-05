@@ -8,7 +8,7 @@ You can view a completed version at [bryanlrobinson.com/bryan-sight](https://bry
 ## Requirements
 - Currently set up to deploy to [Netlify](https://netlify.com)
 - Needs 3 environment variables:
-    - APPROVED_COMMENTS_FORM_ID (form ID from netlify)
+    - STATUS_FORM_ID (form ID from netlify)
     - POST_FORM (form action)
     - API_AUTH (your netlify api auth key)
 - Imgur account (for iOS shortcut integration and photo uploading)
