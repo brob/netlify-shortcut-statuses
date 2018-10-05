@@ -4,12 +4,18 @@ var gulp = require('gulp'),
     run = require('gulp-run'),
     gutil = require('gulp-util'),
     runSequence = require('run-sequence'),
-    fs = require('file-system'),
+    fs = require('fs'),
     request = require('request');
 
 require('dotenv').config();
 var buildSrc = "./";
 
+
+var download = function(uri, filename, callback){
+    request.head(uri, function(err, res, body){      
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+};
 
 gulp.task('build:jekyll', function () {
     var shellCommand = 'jekyll build';
@@ -35,6 +41,40 @@ gulp.task('lambda:build', function () {
         .on('error', gutil.log);
 });
 
+gulp.task('image:get', function() {
+    function imageNeeds() {
+        var idList = fs.readFileSync('_data/statuses.json', 'utf8', function(err, contents) {
+            return statuses;
+        });
+        var jsonEncoded = JSON.parse(idList);
+        const statusImageIds = jsonEncoded.map(status => { let split = status.imgUrl.split('/'); return split[split.length - 1]; });
+        return statusImageIds;
+    } 
+    function currentlyDownloaded() {
+
+        const files = fs.readdirSync('./images/statusImages', (err, files) => {
+            return files;        
+        });
+        const imageIds = files.map(imageUrl => imageUrl.replace('.jpg', ''));
+        return imageIds;
+    }
+
+    const imageIdList = imageNeeds();
+    const downloadedIdList = currentlyDownloaded();
+
+    let needToDownload = imageIdList.filter(e => {
+        return ! downloadedIdList.includes(e);
+    });
+
+    needToDownload.forEach(fileId => {
+        let url = `https://imgur.com/download/${fileId}`;
+        let fileName = `./images/statusImages/${fileId}.jpg`
+        download(url, fileName, function() {
+            console.log(`Downloaded ${url}`);
+        })
+    });
+});
+
 gulp.task('status:get', function () {
     var url = `https://api.netlify.com/api/v1/forms/${process.env.APPROVED_COMMENTS_FORM_ID}/submissions/?access_token=${process.env.API_AUTH}`;
     console.log(url);
@@ -52,6 +92,7 @@ gulp.task('status:get', function () {
                 var status = {
                     status: data.doing,
                     imgUrl: data.imgUrl,
+                    localUrl: `/images/statusImages/${data.imgUrl}`,
                     date: body[item].created_at
                 };
                 statuses.push(status);
@@ -74,9 +115,9 @@ gulp.task('status:get', function () {
 
 
 gulp.task('default', function () {
-    runSequence('status:get', 'serve:jekyll');
+    runSequence('status:get', 'image:get', 'serve:jekyll');
 });
 
 gulp.task('build', function (callback) {
-    runSequence('status:get', 'build:jekyll', 'lambda:build');
+    runSequence('status:get', 'image:get', 'build:jekyll', 'lambda:build');
 });
