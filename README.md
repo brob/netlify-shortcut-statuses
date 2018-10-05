@@ -12,3 +12,4 @@ You can view a completed version at [bryanlrobinson.com/bryan-sight](https://bry
     - POST_FORM (form action)
     - API_AUTH (your netlify api auth key)
 - Imgur account (for iOS shortcut integration and photo uploading)
+- Static Site Generator that can accept a JSON file (Jekyll uses _data/data.json)
