@@ -1,6 +1,6 @@
 'use strict';
 
-var gulp = require('gulp'),
+const gulp = require('gulp'),
     run = require('gulp-run'),
     gutil = require('gulp-util'),
     runSequence = require('run-sequence'),
@@ -20,9 +20,32 @@ function cleanFile(filePath, callback) {
     fs.truncate(filePath, 0, callback);
 }
 
+function getId(imageUrl) {
+    if (imageUrl.endsWith('.jpg')) {
+        // protects against imgur URL changes from 'app' source
+        let idSplit = imageUrl.split('.j');
+        imageUrl = idSplit[0];
+    }
+    let imgUrlSplit = imageUrl.split('/');
+    let imgId = imgUrlSplit[imgUrlSplit.length - 1];
+    return imgId
+}
+
+function buildStatuses(body) {
+    let data = body.data;
+    let imgId = getId(data.imgUrl);
+    const status = {
+        status: data.doing,
+        imgUrl: data.imgUrl,
+        localUrl: `/images/statusImages/${imgId}.jpg`,
+        date: body.created_at
+    };
+    return status;
+}
+
 gulp.task('build:jekyll', function () {
     // Builds Jekyll site
-    var shellCommand = 'jekyll build';
+    const shellCommand = 'jekyll build';
 
     return gulp.src('')
         .pipe(run(shellCommand))
@@ -31,7 +54,7 @@ gulp.task('build:jekyll', function () {
 
 gulp.task('serve:jekyll', function () {
     //Serves Jekyll site locally
-    var shellCommand = "jekyll serve";
+    const shellCommand = "jekyll serve";
 
     return gulp.src('')
         .pipe(run(shellCommand))
@@ -40,7 +63,7 @@ gulp.task('serve:jekyll', function () {
 
 gulp.task('lambda:build', function () {
     // Builds Netlify function (for live)
-    var shellCommand = "netlify-lambda build lambda_build";
+    const shellCommand = "netlify-lambda build lambda_build";
 
     return gulp.src('')
         .pipe(run(shellCommand))
@@ -50,10 +73,10 @@ gulp.task('lambda:build', function () {
 gulp.task('image:get', function() {
     function imageNeeds() {
         // Creates array of all image IDs in JSON file
-        var idList = fs.readFileSync('_data/statuses.json', 'utf8', function(err, contents) {
+        let idList = fs.readFileSync('_data/statuses.json', 'utf8', function(err, contents) {
             return statuses;
         });
-        var jsonEncoded = JSON.parse(idList);
+        let jsonEncoded = JSON.parse(idList);
         const statusImageIds = jsonEncoded.map(status => { let split = status.imgUrl.split('/'); return split[split.length - 1]; });
         return statusImageIds;
     } 
@@ -85,34 +108,16 @@ gulp.task('image:get', function() {
 
 gulp.task('status:get', function () {
     // URL for data store
-    var url = `https://api.netlify.com/api/v1/forms/${process.env.STATUS_FORM_ID}/submissions/?access_token=${process.env.API_AUTH}`;
-    var statusFile = `./_data/statuses.json`;
+    let url = `https://api.netlify.com/api/v1/forms/${process.env.STATUS_FORM_ID}/submissions/?access_token=${process.env.API_AUTH}`;
+    let statusFile = `./_data/statuses.json`;
 
     cleanFile(statusFile, function() {
         // Erases JSON file
         console.log(`${statusFile} cleaned`);
         request(url, function (err, response, body) {
             if (!err && response.statusCode === 200) {
-                var body = JSON.parse(body);
-                var statuses = [];
-                // massage the data into the shape we want,
-                for (var item in body) {
-                    var data = body[item].data;
-                    if (data.imgUrl.endsWith('.jpg')) {
-                        // protects against imgur URL changes from 'app' source
-                        let idSplit = data.imgUrl.split('.j');
-                        data.imgUrl = idSplit[0];
-                    }
-                    let imgUrlSplit = data.imgUrl.split('/');
-                    let imgId = imgUrlSplit[imgUrlSplit.length - 1];
-                    var status = {
-                        status: data.doing,
-                        imgUrl: data.imgUrl,
-                        localUrl: `/images/statusImages/${imgId}.jpg`,
-                        date: body[item].created_at
-                    };
-                    statuses.push(status);
-                }
+                let body = JSON.parse(body);
+                let statuses = body.map(buildStatuses);
 
                 // Write the status to a data file
                 fs.writeFileSync(statusFile, JSON.stringify(statuses, null, 2), function (err) {
@@ -122,6 +127,7 @@ gulp.task('status:get', function () {
                         console.log("Status data saved.");
                     }
                 });
+                console.log(`${statusFile} rebuilt from data`);
     
             } else {
                 console.log("Couldn't get statuses from Netlify");
