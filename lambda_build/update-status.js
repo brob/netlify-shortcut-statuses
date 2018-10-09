@@ -21,7 +21,7 @@ export function handler(event, context, callback) {
     } 
 
     var payload = {
-      'form-name' : "happening-post",
+      'form-name' : process.env.FORM_NAME,
       'received': new Date().toString(),
       'doing': doingString,
       'imgUrl': imgDownloadLink
