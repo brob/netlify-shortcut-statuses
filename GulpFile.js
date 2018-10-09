@@ -17,6 +17,10 @@ var download = function(uri, filename, callback){
     });
 };
 
+function cleanFile(filePath, callback) {
+    fs.truncate(filePath, 0, callback);
+}
+
 gulp.task('build:jekyll', function () {
     var shellCommand = 'jekyll build';
 
@@ -77,40 +81,48 @@ gulp.task('image:get', function() {
 
 gulp.task('status:get', function () {
     var url = `https://api.netlify.com/api/v1/forms/${process.env.STATUS_FORM_ID}/submissions/?access_token=${process.env.API_AUTH}`;
-    console.log(url);
-    request(url, function (err, response, body) {
-        if (!err && response.statusCode === 200) {
-            var body = JSON.parse(body);
-            var statuses = [];
-            // massage the data into the shape we want,
-            for (var item in body) {
-                var data = body[item].data;
-                if (data.imgUrl.endsWith('.jpg')) {
-                    let idSplit = data.imgUrl.split('.j');
-                    data.imgUrl = idSplit[0];
+    var statusFile = `./_data/statuses.json`;
+
+    cleanFile(statusFile, function() {
+        console.log(`${statusFile} cleaned`);
+        request(url, function (err, response, body) {
+            if (!err && response.statusCode === 200) {
+                var body = JSON.parse(body);
+                var statuses = [];
+                // massage the data into the shape we want,
+                for (var item in body) {
+                    var data = body[item].data;
+                    if (data.imgUrl.endsWith('.jpg')) {
+                        let idSplit = data.imgUrl.split('.j');
+                        data.imgUrl = idSplit[0];
+                    }
+                    let imgUrlSplit = data.imgUrl.split('/');
+                    let imgId = imgUrlSplit[imgUrlSplit.length - 1];
+                    var status = {
+                        status: data.doing,
+                        imgUrl: data.imgUrl,
+                        localUrl: `/images/statusImages/${imgId}.jpg`,
+                        date: body[item].created_at
+                    };
+                    statuses.push(status);
                 }
-                var status = {
-                    status: data.doing,
-                    imgUrl: data.imgUrl,
-                    localUrl: `/images/statusImages/${data.imgUrl}`,
-                    date: body[item].created_at
-                };
-                statuses.push(status);
+                console.log(statuses);
+
+                // Write the status to a data file
+                fs.writeFileSync(statusFile, JSON.stringify(statuses, null, 2), function (err) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log("Status data saved.");
+                    }
+                });
+    
+            } else {
+                console.log("Couldn't get statuses from Netlify");
             }
-
-            // Write the status to a data file
-            fs.writeFile(buildSrc + "/_data/statuses.json", JSON.stringify(statuses, null, 2), function (err) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log("Comments data saved.");
-                }
-            });
-
-        } else {
-            console.log("Couldn't get comments from Netlify");
-        }
+        });
     });
+    
 });
 
 
