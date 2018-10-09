@@ -29,7 +29,7 @@
     <div class="statuses">
     {% for status in site.data.statuses %}
         <article class="status">
-            <img src="{{ status.imgUrl }}">
+            <img src="{{ status.localUrl }}">
             <p>{{ status.status }}</p>
         </article>
     {% endfor %}
