@@ -115,9 +115,10 @@ gulp.task('status:get', function () {
         // Erases JSON file
         console.log(`${statusFile} cleaned`);
         request(url, function (err, response, body) {
+            // console.log(body);
             if (!err && response.statusCode === 200) {
-                let body = JSON.parse(body);
-                let statuses = body.map(buildStatuses);
+                let bodyArray = JSON.parse(body);
+                let statuses = bodyArray.map(buildStatuses);
 
                 // Write the status to a data file
                 fs.writeFileSync(statusFile, JSON.stringify(statuses, null, 2), function (err) {
