@@ -1,5 +1,17 @@
 [
   {
+    "status": "testing this",
+    "imgUrl": "https://imgur.com/download/4oV1CDO",
+    "localUrl": "/images/statusImages/4oV1CDO.jpg",
+    "date": "2018-10-09T17:40:37.041Z"
+  },
+  {
+    "status": "hello",
+    "imgUrl": "https://imgur.com/download/4oV1CDO",
+    "localUrl": "/images/statusImages/4oV1CDO.jpg",
+    "date": "2018-10-09T17:38:25.547Z"
+  },
+  {
     "status": "Doing something awesome",
     "imgUrl": "https://imgur.com/4oV1CDO",
     "localUrl": "/images/statusImages/4oV1CDO.jpg",
