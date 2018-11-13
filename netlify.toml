@@ -1,2 +1,4 @@
 [build]
   functions = "./functions"
+  command = "gulp build"
+  publish = "_site"
