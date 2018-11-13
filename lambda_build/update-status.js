@@ -29,7 +29,7 @@ export function handler(event, context, callback) {
 
     var approvedURL = process.env.POST_FORM;
 
-    request.post({'url':approvedURL, 'formData': payload }, function(err, httpResponse, body) {
+    request.post({'uri':approvedURL, 'formData': payload }, function(err, httpResponse, body) {
       var msg;
 
       if (err) {
