@@ -2,3 +2,4 @@
   functions = "./functions"
   command = "gulp build"
   publish = "_site"
+  NODE_ENV = "^8.8.1"

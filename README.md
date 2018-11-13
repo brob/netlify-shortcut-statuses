@@ -23,6 +23,6 @@ You can view a completed version at [bryanlrobinson.com/bryan-sight](https://bry
 3. Set up a "Deploy Hook" to rebuild the site and deploy
 4. Add a "Notification" to the form to trigger the deploy hook created in 2
 5. If Netlify doesn't automatically register it, set your build to run `gulp build` and your publish directory to `_site`.
-6. Submit a query to `<site-url>/.netlify/functions/update-status/?status=<your status>&imgUrl=<img url>`
+6. Submit a query to `<site-url>/.netlify/functions/update-status/?doing=<your status>&imgUrl=<img url>`
 
 This is mostly meant as a proof of concept and to be extended in other ways. Feel free to fork and use it for all sorts of crazy dynamically static stuff!
