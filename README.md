@@ -4,6 +4,8 @@ This repository is the cleaned version of a Netlify function and build process t
 
 You can view a completed version at [bryanlrobinson.com/bryan-sight](https://bryanlrobinson.com/bryan-sight)
 
+You can read the [blog post here](https://bryanlrobinson.com/blog/2018/11/12/ios-shortcuts-pushing-data-to-netlify-static-site/)
+
 
 ## Requirements
 - Currently set up to deploy to [Netlify](https://netlify.com)
