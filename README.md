@@ -8,9 +8,9 @@ You can view a completed version at [bryanlrobinson.com/bryan-sight](https://bry
 ## Requirements
 - Currently set up to deploy to [Netlify](https://netlify.com)
 - Needs 3 environment variables:
-    - STATUS_FORM_ID (form ID from netlify)
+    - STATUS_FORM_ID (form ID from netlify; navigate to the form in Netlify and grab the last piece of the URL)
     - POST_FORM (form action: any page on the site where the form exists; this should be a full URL including protocol) 
-    - FORM_NAME (the name of the form in your form-stub)
+    - FORM_NAME (the name of the form in your form-stub; by default this is `netlify-shortcut-demo`)
     - API_AUTH (your netlify api auth key)
 - Imgur account (for iOS shortcut integration and photo uploading)
 - Static Site Generator that can accept a JSON file (Jekyll uses _data/data.json)
